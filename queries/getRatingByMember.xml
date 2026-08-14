@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<query id="getRatingByMember" action="select">
+	<tables>
+		<table name="document_star" />
+	</tables>
+	<columns>
+		<column name="star_rate" />
+		<column name="document_srl" />
+		<column name="member_srl" />
+		<column name="regdate" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="document_srl" var="document_srl" filter="number" notnull="notnull" />
+		<condition operation="equal" column="member_srl" var="member_srl" filter="number" notnull="notnull" />
+	</conditions>
+	<limit>1</limit>
+</query>

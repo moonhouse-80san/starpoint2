@@ -1,0 +1,71 @@
+
+{@
+	$my_s = 'N';
+	//평점 모듈
+	$oStarPointModel = getModel('starpoint');
+	//평점을 평가 했는지 여부를 체크하고, 게시글의 전체 평균 점수를 제공합니다.
+	$my_starpoint = $oStarPointModel->getIsRated($oDocument->document_srl);
+	$total_point = $oStarPointModel->getDocumentRatedTotalPoint($oDocument->document_srl);
+	if($my_starpoint) $my_s = 'Y';
+	if(!$module_info->starpoint_text) $module_info->starpoint_text = '글';
+}
+
+<div class="rating-container">
+	<div class="rating-widget">
+		<div class="rating-title">이 {$module_info->starpoint_text}의 평점 (참여 : {$total_point->count_members} / 총 점수 : {$total_point->sum})</div>
+
+		<div class="rating-average">
+			<div class="label">평균 평점 :</div>
+			<div class="stars">
+				<!--@for($i=1;$i<=5;$i++)-->
+					<span class="star {$total_point->avg >= $i ? 'filled' : ($total_point->avg >= $i-0.5 ? 'half-filled' : 'empty')}">★</span>
+				<!--@end-->
+				<span class="score">{number_format($total_point->avg, 1)}점</span>
+			</div>
+		</div>
+
+		<!--@if($is_logged && $my_s != 'Y')-->
+			<!--@if(abs($oDocument->get('member_srl'))!==$logged_info->member_srl || $grant->is_admin)-->
+				<div class="rating-form">
+					<div class="my-rating">
+						<div class="label">내 평점 :</div>
+						<div class="stars" id="star-selector">
+							<!--@for($i=1;$i<=5;$i++)-->
+							<span class="star star-select" data-value="{$i}">★</span>
+							<!--@end-->
+						</div>
+						<div class="selected-rating">
+							<span id="selected-value">0</span>점
+						</div>
+					</div>
+						<div class="submit-button">
+							<button type="button" class="spb" id="submit-rating" data-document-srl="{$oDocument->document_srl}">평가하기</button>
+						</div>
+				</div>
+			<!--@else-->
+				<div class="login-required">본인의 글은 평가할 수 없습니다.</div>
+			<!--@end-->
+		<!--@elseif($is_logged && $my_s == 'Y')-->
+			<div class="already-rated">
+			<div class="my-rating-display">
+				<div class="label">내가 평가한 점수 :</div>
+				<div class="stars" style="display: inline-block;">
+					<!--@if(is_object($my_starpoint) && isset($my_starpoint->star_rate))-->
+						<!--@for($i=1;$i<=5;$i++)-->
+						<span class="star {$my_starpoint->star_rate >= $i ? 'filled' : 'empty'}">★</span>
+						<!--@end-->
+						<span class="score">{$my_starpoint->star_rate}점</span>
+					<!--@else-->
+						<span class="score">평점 정보를 찾을 수 없습니다.</span>
+					<!--@end-->
+				</div>
+			</div>
+		</div>
+		<span class="submit-button">
+			<button type="button" class="spb cancel-btn" id="cancel-rating" data-document-srl="{$oDocument->document_srl}">평가 취소</button>
+		</span>
+		<!--@elseif(!$is_logged)-->
+			<div class="login-required">로그인 후 평가하실 수 있습니다.</div>
+		<!--@end-->
+	</div>
+</div>

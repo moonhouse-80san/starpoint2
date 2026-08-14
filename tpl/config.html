@@ -1,0 +1,150 @@
+<load target="js/jquery.js" />
+
+<div class="x_page-header">
+	<h1>게시글 별 평점 모듈 설정</h1>
+</div>
+
+<form ruleset="insertConfig" action="./" method="post" class="x_form-horizontal">
+	<input type="hidden" name="module" value="starpoint" />
+	<input type="hidden" name="act" value="procStarpointAdminInsertConfig" />
+	<input type="hidden" name="success_return_url" value="{getRequestUriByServerEnviroment()}" />
+	<input type="hidden" name="xe_validator_id" value="modules/starpoint/tpl/config/1" />
+	
+	<section class="section">
+		<h2>기본 설정</h2>
+		
+		<div class="x_control-group">
+			<label class="x_control-label">평점 모듈 사용</label>
+			<div class="x_controls">
+				<label class="x_inline">
+					<input type="radio" name="use_starpoint" value="Y" checked="checked"|cond="$config->use_starpoint == 'Y'" /> 사용함
+				</label>
+				<label class="x_inline">
+					<input type="radio" name="use_starpoint" value="N" checked="checked"|cond="$config->use_starpoint != 'Y'" /> 사용안함
+				</label>
+				<p class="x_help-block">전체 게시판에서 평점 모듈 사용 여부를 설정합니다.</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">기본 스킨</label>
+			<div class="x_controls">
+				<select name="default_skin">
+					<option value="simple" selected="selected"|cond="$config->default_skin == 'simple'">Simple</option>
+					<option value="default" selected="selected"|cond="$config->default_skin == 'default'">Default</option>
+					<option value="black_simple" selected="selected"|cond="$config->default_skin == 'black_simple'">Black Simple</option>
+					<option value="black_default" selected="selected"|cond="$config->default_skin == 'black_default'">Black Default</option>
+				</select>
+				<p class="x_help-block">평점 위젯의 기본 스킨을 선택합니다.</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">타이틀 문구</label>
+			<div class="x_controls">
+				<input type="text" name="starpoint_text" value="{$config->starpoint_text ? $config->starpoint_text : '글'}" class="lang_code" />
+				<p class="x_help-block">평점 위젯 상단에 표시될 문구 (예: 글, 게시물, 리뷰 등)</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">평가 회원 출력</label>
+			<div class="x_controls">
+				<select name="vote_members">
+					<option value="Y" selected="selected"|cond="$config->vote_members == 'Y'">출력함</option>
+					<option value="N" selected="selected"|cond="$config->vote_members == 'N'">출력안함</option>
+					<option value="A" selected="selected"|cond="$config->vote_members == 'A'">관리자만 출력</option>
+				</select>
+				<p class="x_help-block">평점을 준 회원 목록 표시 여부</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">회원 출력 형태</label>
+			<div class="x_controls">
+				<select name="vm_form">
+					<option value="simple" selected="selected"|cond="$config->vm_form == 'simple'">Simple</option>
+					<option value="default" selected="selected"|cond="$config->vm_form == 'default'">Default</option>
+					<option value="both" selected="selected"|cond="$config->vm_form == 'both'">Simple + Default (관리자)</option>
+				</select>
+				<p class="x_help-block">평가 회원 목록의 출력 형태</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<h2>적용 게시판 선택</h2>
+		
+		<div class="x_control-group">
+			<label class="x_control-label">적용 모듈</label>
+			<div class="x_controls">
+				<label class="x_inline">
+					<input type="radio" name="apply_type" value="all" checked="checked"|cond="$config->apply_type == 'all'" onclick="jQuery('.module_list').hide();" /> 모든 게시판에 적용
+				</label>
+				<label class="x_inline">
+					<input type="radio" name="apply_type" value="select" checked="checked"|cond="$config->apply_type == 'select'" onclick="jQuery('.module_list').show();" /> 선택한 게시판만 적용
+				</label>
+			</div>
+		</div>
+
+		<div class="x_control-group module_list" style="display:{$config->apply_type == 'select' ? 'block' : 'none'}">
+			<label class="x_control-label">게시판 선택</label>
+			<div class="x_controls">
+				{@
+					$oModuleModel = getModel('module');
+					$args = new stdClass();
+					$args->module = 'board';
+					$args->site_srl = 0;
+					$output = executeQueryArray('module.getMidList', $args);
+					$module_list = $output->data;
+				}
+				<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:4px 8px;">
+					<!--@if($module_list && count($module_list) > 0)-->
+						<!--@foreach($module_list as $key => $val)-->
+						<label class="x_block" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+							<input type="checkbox" name="target_modules[]" value="{$val->module_srl}" 
+								checked="checked"|cond="is_array($config->target_modules) && in_array($val->module_srl, $config->target_modules)" />
+							{$val->browser_title} ({$val->mid})
+						</label>
+						<!--@end-->
+					<!--@else-->
+						<p class="x_help-block">게시판이 없습니다. 먼저 게시판을 생성해주세요.</p>
+					<!--@end-->
+				</div>
+				<p class="x_help-block">평점 모듈을 적용할 게시판을 선택하세요.</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="x_clearfix btnArea">
+		<button type="submit" class="x_btn x_btn-primary x_pull-right">설정 저장</button>
+	</div>
+</form>
+
+<script>
+	jQuery(function($){
+		// 페이지 로드 시 적용 타입에 따라 게시판 목록 표시/숨김
+		if($('input[name="apply_type"]:checked').val() == 'select') {
+			$('.module_list').show();
+		} else {
+			$('.module_list').hide();
+		}
+	});
+</script>
+
+<script>
+	// 적용 방식 변경 시 이벤트
+	$(document).ready(function() {
+		$('input[name="apply_type"]').change(function() {
+			var val = $(this).val();
+			if(val == 'select') {
+				$('tr[cond*="selected"]').show();
+			} else {
+				$('tr[cond*="selected"]').hide();
+			}
+		});
+		
+		// 초기 상태 설정
+		$('input[name="apply_type"]:checked').trigger('change');
+	});
+</script>

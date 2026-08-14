@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<query id="getRatingStatistics" action="select">
+	<tables>
+		<table name="document_star" />
+	</tables>
+	<columns>
+		<column name="AVG(star_rate)" alias="avg_rating" />
+		<column name="COUNT(*)" alias="total_ratings" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="document_srl" var="document_srl" filter="number" notnull="notnull" />
+	</conditions>
+</query>
