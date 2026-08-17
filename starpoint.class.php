@@ -73,7 +73,7 @@ class Starpoint extends ModuleObject
 
 		// V2.4: 평가 회원 목록을 display 트리거에서 직접 렌더링
 		$config = $oModuleModel->getModuleConfig('starpoint');
-		if(!$config || !isset($config->version) || $config->version !== '2.5') return true;
+		if(!$config || !isset($config->version) || $config->version !== '2.2') return true;
 
 		return false;
 	}
@@ -113,7 +113,7 @@ public function moduleUpdate()
 		$config = $oModuleModel->getModuleConfig('starpoint');
 		if(!$config) $config = new stdClass();
 		if(!isset($config->allow_guest_rate)) $config->allow_guest_rate = 'N';
-		$config->version = '2.5';
+		$config->version = '2.2';
 		$oModuleController->insertModuleConfig('starpoint', $config);
 
 		return new BaseObject();
