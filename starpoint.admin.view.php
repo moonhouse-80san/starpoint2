@@ -30,6 +30,7 @@ class StarpointAdminView extends Starpoint
 			$config->use_starpoint = 'N';
 			$config->default_skin = 'simple';
 			$config->starpoint_text = '글';
+			$config->allow_guest_rate = 'N';
 			$config->vote_members = 'Y';
 			$config->vm_form = 'simple';
 			$config->apply_type = 'all';

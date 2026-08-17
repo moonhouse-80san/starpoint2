@@ -27,6 +27,19 @@
 		</div>
 
 		<div class="x_control-group">
+			<label class="x_control-label">비로그인 평가 허용</label>
+			<div class="x_controls">
+				<label class="x_inline">
+					<input type="radio" name="allow_guest_rate" value="Y" checked="checked"|cond="$config->allow_guest_rate == 'Y'" /> 허용함
+				</label>
+				<label class="x_inline">
+					<input type="radio" name="allow_guest_rate" value="N" checked="checked"|cond="$config->allow_guest_rate != 'Y'" /> 허용안함
+				</label>
+				<p class="x_help-block">로그인하지 않은 방문자도 별점 평가에 참여할 수 있도록 허용합니다. (접속 IP 기준으로 중복 평가를 제한하며, 회원 평가만큼 정확하지는 않습니다)</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
 			<label class="x_control-label">기본 스킨</label>
 			<div class="x_controls">
 				<select name="default_skin">

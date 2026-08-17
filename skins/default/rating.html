@@ -8,6 +8,8 @@
 	$total_point = $oStarPointModel->getDocumentRatedTotalPoint($oDocument->document_srl);
 	if($my_starpoint) $my_s = 'Y';
 	if(!$module_info->starpoint_text) $module_info->starpoint_text = '글';
+	$allow_guest_rate = isset($config->allow_guest_rate) && $config->allow_guest_rate == 'Y';
+	$can_rate = $is_logged || $allow_guest_rate;
 }
 
 <div class="rating-container">
@@ -24,8 +26,8 @@
 			</div>
 		</div>
 
-		<!--@if($is_logged && $my_s != 'Y')-->
-			<!--@if(abs($oDocument->get('member_srl'))!==$logged_info->member_srl || $grant->is_admin)-->
+		<!--@if($can_rate && $my_s != 'Y')-->
+			<!--@if(!$is_logged || abs($oDocument->get('member_srl'))!==$logged_info->member_srl || $grant->is_admin)-->
 				<div class="rating-form">
 					<div class="my-rating">
 						<div class="label">내 평점 :</div>
@@ -45,7 +47,7 @@
 			<!--@else-->
 				<div class="login-required">본인의 글은 평가할 수 없습니다.</div>
 			<!--@end-->
-		<!--@elseif($is_logged && $my_s == 'Y')-->
+		<!--@elseif($can_rate && $my_s == 'Y')-->
 			<div class="already-rated">
 			<div class="my-rating-display">
 				<div class="label">내가 평가한 점수 :</div>
@@ -64,7 +66,7 @@
 		<span class="submit-button">
 			<button type="button" class="spb cancel-btn" id="cancel-rating" data-document-srl="{$oDocument->document_srl}">평가 취소</button>
 		</span>
-		<!--@elseif(!$is_logged)-->
+		<!--@else-->
 			<div class="login-required">로그인 후 평가하실 수 있습니다.</div>
 		<!--@end-->
 	</div>

@@ -6,6 +6,7 @@
 		<column name="document_srl" var="document_srl" notnull="notnull" />
 		<column name="member_srl" var="member_srl" notnull="notnull" />
 		<column name="star_rate" var="star_rate" notnull="notnull" />
+		<column name="ipaddress" var="ipaddress" default="" />
 		<column name="regdate" var="regdate" default="now()" />
 	</columns>
 </query>

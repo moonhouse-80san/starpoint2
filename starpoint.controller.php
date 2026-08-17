@@ -5,7 +5,8 @@ class StarpointController extends Starpoint
 	public function procStarpointDoRateDocument()
 	{
 		$logged_info = Context::get('logged_info');
-		if (!$logged_info) {
+		$oStarPoint = getModel('starpoint');
+		if (!$logged_info && !$oStarPoint->isGuestRateAllowed()) {
 			return new BaseObject(-1, '로그인이 필요합니다.');
 		}
 
@@ -26,13 +27,17 @@ class StarpointController extends Starpoint
 			return new BaseObject(-1, '존재하지 않는 게시글입니다.');
 		}
 
-		$oStarPoint = getModel('starpoint');
 		$isRated = $oStarPoint->getIsRated($document_srl);
 
 		if($isRated){
 			return new BaseObject(-1, '이미 평가하셨습니다.');
 		} else {
-			$result = $oStarPoint->insertStarRate($document_srl, $star_srl);
+			if($logged_info){
+				$result = $oStarPoint->insertStarRate($document_srl, $star_srl);
+			} else {
+				// 비로그인 평가: 회원번호는 0으로, 중복 방지를 위해 접속 IP를 함께 저장합니다.
+				$result = $oStarPoint->insertStarRate($document_srl, $star_srl, 0, $oStarPoint->getClientIp());
+			}
 			if (!$result->toBool()) {
 				return $result;
 			}
@@ -52,7 +57,8 @@ class StarpointController extends Starpoint
 	public function procStarpointDeleteRating()
 	{
 		$logged_info = Context::get('logged_info');
-		if (!$logged_info) {
+		$oStarPoint = getModel('starpoint');
+		if (!$logged_info && !$oStarPoint->isGuestRateAllowed()) {
 			return new BaseObject(-1, '로그인이 필요합니다.');
 		}
 
@@ -63,14 +69,19 @@ class StarpointController extends Starpoint
 
 		$args = new stdClass();
 		$args->document_srl = $document_srl;
-		$args->member_srl = $logged_info->member_srl;
+		if ($logged_info) {
+			$args->member_srl = $logged_info->member_srl;
+		} else {
+			// 비로그인 평가 취소는 회원번호 0 + 접속 IP가 일치하는 건만 대상으로 합니다.
+			$args->member_srl = 0;
+			$args->ipaddress = $oStarPoint->getClientIp();
+		}
 
 		$output = executeQuery('starpoint.deleteRating', $args);
 		if (!$output->toBool()) {
 			return $output;
 		}
 
-		$oStarPoint = getModel('starpoint');
 		$stats = $oStarPoint->getStarPointStatistics($document_srl);
 		if ($stats) {
 			$this->add('avg_rating', $stats->avg_rating);

@@ -17,6 +17,7 @@ class StarpointAdminController extends Starpoint
 		
 		$config = new stdClass();
 		$config->use_starpoint = $vars->use_starpoint ? $vars->use_starpoint : 'N';
+		$config->allow_guest_rate = $vars->allow_guest_rate ? $vars->allow_guest_rate : 'N';
 		$config->default_skin = $vars->default_skin ? $vars->default_skin : 'simple';
 		$config->starpoint_text = $vars->starpoint_text ? $vars->starpoint_text : '글';
 		$config->vote_members = $vars->vote_members ? $vars->vote_members : 'Y';

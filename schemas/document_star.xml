@@ -4,4 +4,5 @@
 	<column name="member_srl" type="number" size="11" notnull="notnull" index="idx_member_srl" />
 	<column name="star_rate" type="number" size="11" notnull="notnull"  index="idx_star_rate"/>
 	<column name="regdate" type="date" index="idx_regdate" />
+	<column name="ipaddress" type="varchar" size="45" index="idx_ipaddress" />
 </table>

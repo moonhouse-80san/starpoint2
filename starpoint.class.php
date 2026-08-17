@@ -2,7 +2,7 @@
 
 class Starpoint extends ModuleObject
 {
-	const STARPOINT_VERSION = '2.4';
+	const STARPOINT_VERSION = '2.2';
 	public function createObject($status = 0, $message = 'success')
 	{
 		$args = func_get_args();
@@ -68,9 +68,12 @@ class Starpoint extends ModuleObject
 		$oDB = &DB::getInstance();
 		if(!$oDB->isColumnExists('document_star', 'regdate')) return true;
 
+		// V2.5: 비로그인(게스트) 평가 중복 방지를 위한 ipaddress 컬럼
+		if(!$oDB->isColumnExists('document_star', 'ipaddress')) return true;
+
 		// V2.4: 평가 회원 목록을 display 트리거에서 직접 렌더링
 		$config = $oModuleModel->getModuleConfig('starpoint');
-		if(!$config || !isset($config->version) || $config->version !== '2.4') return true;
+		if(!$config || !isset($config->version) || $config->version !== '2.5') return true;
 
 		return false;
 	}
@@ -96,9 +99,21 @@ public function moduleUpdate()
 			$oDB->addColumn('document_star', 'regdate', 'date', 'idx_regdate');
 		}
 
+		if(!$oDB->isColumnExists('document_star', 'ipaddress'))
+		{
+			// addColumn() 시그니처: (table, column, type, size, default, notnull, after_column)
+			// 인덱스명은 addColumn()의 인자가 아니라 addIndex()로 별도 생성해야 합니다.
+			$oDB->addColumn('document_star', 'ipaddress', 'varchar', 45, '');
+			if(!$oDB->isIndexExists('document_star', 'idx_ipaddress'))
+			{
+				$oDB->addIndex('document_star', 'idx_ipaddress', 'ipaddress');
+			}
+		}
+
 		$config = $oModuleModel->getModuleConfig('starpoint');
 		if(!$config) $config = new stdClass();
-		$config->version = '2.4';
+		if(!isset($config->allow_guest_rate)) $config->allow_guest_rate = 'N';
+		$config->version = '2.5';
 		$oModuleController->insertModuleConfig('starpoint', $config);
 
 		return new BaseObject();

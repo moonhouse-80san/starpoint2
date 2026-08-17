@@ -106,6 +106,7 @@ class starpointView extends starpoint
 			$config->use_starpoint = 'N';
 			$config->default_skin = 'simple';
 			$config->starpoint_text = '글';
+			$config->allow_guest_rate = 'N';
 		}
 		
 		return $config;
@@ -299,7 +300,11 @@ class starpointView extends starpoint
 				{
 					$member_srl = isset($rating->member_srl) ? (int)$rating->member_srl : 0;
 					$nick_name = isset($rating->nick_name) ? trim((string)$rating->nick_name) : '';
-					$display_name = $nick_name !== '' ? $nick_name : '탈퇴회원';
+					if ($member_srl === 0) {
+						$display_name = 'Guest';
+					} else {
+						$display_name = $nick_name !== '' ? $nick_name : '탈퇴회원';
+					}
 					$display_name = htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8');
 					$star_rate = isset($rating->star_rate) ? (int)$rating->star_rate : 0;
 					$regdate = isset($rating->regdate) ? $rating->regdate : '';
@@ -342,7 +347,12 @@ class starpointView extends starpoint
 					$member_html .= '<div class="vm_admin_detail"><div class="vm_detail_list" style="display:none;"><table><thead><tr class="vm_tr"><th class="vm_th">회원</th><th class="vm_th">평점</th><th class="vm_th">평가일시</th></tr></thead><tbody>';
 					foreach ($rating_list as $rating)
 					{
-						$name = isset($rating->nick_name) && $rating->nick_name !== '' ? htmlspecialchars($rating->nick_name, ENT_QUOTES, 'UTF-8') : '탈퇴회원';
+						$row_member_srl = isset($rating->member_srl) ? (int)$rating->member_srl : 0;
+						if ($row_member_srl === 0) {
+							$name = 'Guest';
+						} else {
+							$name = isset($rating->nick_name) && $rating->nick_name !== '' ? htmlspecialchars($rating->nick_name, ENT_QUOTES, 'UTF-8') : '탈퇴회원';
+						}
 						$rate = (int)$rating->star_rate;
 						$stars = str_repeat('★', max(0, min(5, $rate))) . str_repeat('☆', max(0, 5 - min(5, $rate)));
 						$member_html .= '<tr class="vm_tr1"><td class="vm_th">' . $name . '</td><td class="vm_th"><span class="vm_star">' . $stars . '</span> ' . $rate . '점</td><td class="vm_th">' . (isset($rating->regdate) ? zdate($rating->regdate, 'Y-m-d H:i') : '') . '</td></tr>';
